@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WHO WANTS TO BE A BILLIONAIRE</title>
+<link rel="manifest" href="manifest.json"/>
+  <link rel="icon" type="image/png" sizes="192x192" href="icon(2).png">
+    <link rel="apple-touch-icon" href="icon(2).png">
+  <meta name="theme-color" content="#000000">
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#87CEFA,#000);
+    color:white;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.game{
+    width:95%;
+    max-width:900px;
+    background:rgba(0,0,0,0.8);
+    border:3px solid #87CEFA;
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 0 30px #87CEFA;
+}
+
+h1{
+    text-align:center;
+    color:#87CEFA;
+    margin-bottom:20px;
+}
+
+.money{
+    text-align:center;
+    font-size:22px;
+    margin-bottom:20px;
+    color:gold;
+}
+
+.question{
+    background:#111;
+    border:2px solid #87CEFA;
+    border-radius:15px;
+    padding:20px;
+    font-size:22px;
+    margin-bottom:20px;
+}
+
+.answers{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.answer{
+    background:#1d1d1d;
+    border:2px solid #87CEFA;
+    color:white;
+    padding:15px;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:18px;
+    transition:.3s;
+}
+
+.answer:hover{
+    background:#87CEFA;
+    color:black;
+}
+
+.correct{
+    background:green !important;
+}
+
+.wrong{
+    background:red !important;
+}
+
+#restart{
+    margin-top:20px;
+    width:100%;
+    padding:12px;
+    border:none;
+    background:#87CEFA;
+    color:black;
+    font-size:18px;
+    border-radius:10px;
+    cursor:pointer;
+    display:none;
+}
+</style>
+</head>
+<body>
+<audio id="bgMusic" loop>
+    <source src="ef0eec5.m4a" type="audio/mpeg">
+</audio>
+
+<div class="game">
+
+<h1>💰 WHO WANTS TO BE A BILLIONAIRE 💰</h1>
+
+<div class="money" id="money">
+$0
+</div>
+
+<div class="question" id="question">
+Loading...
+</div>
+
+<div class="answers" id="answers"></div>
+
+<button id="restart">Play Again</button>
+
+</div>
+<script>
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then((reg) => {
+          console.log('Service Worker registered successfully:', reg.scope);
+        })
+        .catch((err) => {
+          console.log('Service Worker registration failed:', err);
+        });
+    });
+  }
+
+const music = document.getElementById("bgMusic");
+
+document.addEventListener("click", () => {
+    music.play();
+}, { once: true });
+
+// --- Pool 1: Normal Questions ---
+const questions = [
+    {
+    question:"What is the capital of Nigeria?",
+    answers:["Lagos","Abuja","Kano","Uyo"],
+    correct:1
+    },
+    {
+    question:"How many days are in a week?",
+    answers:["5","6","7","8"],
+    correct:2
+    },
+    {
+    question:"Which planet is known as the Red Planet?",
+    answers:["Mars","Earth","Venus","Jupiter"],
+    correct:0
+    },
+    {
+    question:"What is 10 × 10?",
+    answers:["100","50","90","110"],
+    correct:0
+    },
+    {
+    question:"Which language runs in a web browser?",
+    answers:["Python","Java","JavaScript","C++"],
+    correct:2
+    },
+    {
+    question:"What color do you get when you mix red and blue?",
+    answers:["Green","Purple","Yellow","Orange"],
+    correct:1
+    },
+    {
+    question:"Who wrote Romeo and Juliet?",
+    answers:["Shakespeare","Chinua Achebe","Soyinka","Dickens"],
+    correct:0
+    },
+    {
+    question:"Which ocean is the largest?",
+    answers:["Indian","Arctic","Atlantic","Pacific"],
+    correct:3
+    },
+    {
+    question:"How many continents are there?",
+    answers:["5","6","7","8"],
+    correct:2
+    },
+    {
+    question:"What is the square root of 144?",
+    answers:["10","11","12","13"],
+    correct:2
+    }
+];
+
+// --- Pool 2: Harder Questions ---
+const hardQuestions = [
+    {
+    question:"What is the rarest naturally occurring element on Earth?",
+    answers:["Astatine","Francium","Oganesson","Promethium"],
+    correct:0
+    },
+    {
+    question:"Which artist painted 'The Garden of Earthly Delights'?",
+    answers:["Hieronymus Bosch","Peter Paul Rubens","Rembrandt","Jan van Eyck"],
+    correct:0
+    },
+    {
+    question:"What is the chemical formula for Caffeine?",
+    answers:["C6H12O6","C8H10N4O2","C10H14N2","C3H5N3O9"],
+    correct:1
+    },
+    {
+    question:"In physics, what does the term 'Absolute Zero' represent in Celsius?",
+    answers:["-100 °C","-273.15 °C","-459.67 °C","0 °C"],
+    correct:1
+    },
+    {
+    question:"Which ancient civilization wrote the Code of Hammurabi?",
+    answers:["Egyptians","Babylonians","Romans","Persians"],
+    correct:1
+    },
+    {
+    question:"What is the main functional unit of the human kidney?",
+    answers:["Nephron","Neuron","Alveolus","Capillary"],
+    correct:0
+    },
+    {
+    question:"Which country features the Shipwreck Beach (Navagio) wrapped in limestone cliffs?",
+    answers:["Italy","Croatia","Greece","Thailand"],
+    correct:2
+    },
+    {
+    question:"What was the name of the first artificial satellite launched into space in 1957?",
+    answers:["Apollo 11","Sputnik 1","Vostok 1","Explorer 1"],
+    correct:1
+    },
+    {
+    question:"Which philosopher wrote 'Critique of Pure Reason'?",
+    answers:["Friedrich Nietzsche","Immanuel Kant","Karl Marx","Jean-Paul Sartre"],
+    correct:1
+    },
+    {
+    question:"What is the deepest known point in the Earth's oceans?",
+    answers:["Java Trench","Puerto Rico Trench","Challenger Deep","Sunda Trench"],
+    correct:2
+    }
+];
+
+// Extended prize tiers to support 20 steps total
+const prizes = [
+    "$1,000", "$5,000", "$10,000", "$20,000", "$50,000", 
+    "$100,000", "$500,000", "$1,000,000", "$5,000,000", "$10,000,000", // Stage 1 Finish ($10M)
+    "$25,000,000", "$50,000,000", "$100,000,000", "$200,000,000", "$400,000,000", 
+    "$500,000,000", "$600,000,000", "$700,000,000", "$850,000,000", "$1,000,000,000" // Stage 2 Finish ($1B)
+];
+
+let current = 0;
+let currentStage = "normal"; // Keeps track of whether pool is "normal" or "hard"
+
+const questionEl = document.getElementById("question");
+const answersEl = document.getElementById("answers");
+const moneyEl = document.getElementById("money");
+const restartBtn = document.getElementById("restart");
+
+function loadQuestion(){
+    // Select question pool based on current stage
+    const activePool = (currentStage === "normal") ? questions : hardQuestions;
+    const q = activePool[current];
+
+    questionEl.textContent = q.question;
+    answersEl.innerHTML = "";
+
+    q.answers.forEach((answer, index) => {
+        const btn = document.createElement("button");
+        btn.className = "answer";
+        btn.textContent = answer;
+        btn.onclick = () => checkAnswer(btn, index);
+        answersEl.appendChild(btn);
+    });
+}
+
+function checkAnswer(button, index){
+    const activePool = (currentStage === "normal") ? questions : hardQuestions;
+    const correct = activePool[current].correct;
+    const buttons = document.querySelectorAll(".answer");
+
+    buttons.forEach(btn => btn.disabled = true);
+
+    // Calculate total prize pointer index based on stage
+    let overallIndex = (currentStage === "normal") ? current : current + 10;
+
+    if(index === correct){
+        button.classList.add("correct");
+        moneyEl.textContent = prizes[overallIndex];
+
+        setTimeout(() => {
+            current++;
+
+            // Check if we hit the end of the active question array
+            if(current >= activePool.length){
+                if(currentStage === "normal") {
+                    // Transition to the hard pool
+                    currentStage = "hard";
+                    current = 0;
+                    questionEl.innerHTML = "🚀 LEVEL UP!<br><br>Preparing the harder questions...";
+                    answersEl.innerHTML = "";
+                    
+                    setTimeout(() => {
+                        loadQuestion();
+                    }, 2000);
+                } else {
+                    // Completed both normal and hard questions
+                    questionEl.innerHTML = "🎉 CONGRATULATIONS!<br><br>You mastered the hard tier and became a BILLIONAIRE!";
+                    answersEl.innerHTML = "";
+                    restartBtn.style.display = "block";
+                }
+            } else {
+                loadQuestion();
+            }
+        }, 1500);
+
+    } else {
+        button.classList.add("wrong");
+        buttons[correct].classList.add("correct");
+
+        setTimeout(() => {
+            questionEl.innerHTML = 
+                "❌ Game Over!<br><br>You leave with " + 
+                (overallIndex > 0 ? prizes[overallIndex - 1] : "$0");
+
+            answersEl.innerHTML = "";
+            restartBtn.style.display = "block";
+        }, 2000);
+    }
+}
+
+restartBtn.onclick = () => {
+    current = 0;
+    currentStage = "normal";
+    moneyEl.textContent = "$0";
+    restartBtn.style.display = "none";
+    loadQuestion();
+};
+
+loadQuestion();
+</script>
+
+</body>
+  </html>
